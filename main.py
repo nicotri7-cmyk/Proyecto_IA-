@@ -29,8 +29,12 @@ from models import Producto, Pedido, DetallePedido, seed_data, DIET_INFO_DEFAULT
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("kiosco-voz")
 
-# Configuración de cliente OpenAI apuntando a Ollama
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1")
+# Configuración de cliente OpenAI apuntando a Ollama (compatible con local, Docker y Easypanel)
+_ollama_env = os.getenv("OLLAMA_BASE_URL") or os.getenv("OLLAMA_HOST")
+if _ollama_env:
+    OLLAMA_BASE_URL = _ollama_env if _ollama_env.endswith("/v1") else f"{_ollama_env.rstrip('/')}/v1"
+else:
+    OLLAMA_BASE_URL = "http://127.0.0.1:11434/v1"
 MODEL_NAME = os.getenv("MODEL_NAME", "llama3.2:1b")
 openai_client = OpenAI(base_url=OLLAMA_BASE_URL, api_key="ollama")
 

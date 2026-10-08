@@ -180,6 +180,22 @@
 
 ---
 
+### Versión 1.9 - Soporte para Docker, Easypanel y Despliegues en Contenedores
+- **Creación de Dockerfile**:
+  - Imagen base ligera `python:3.11-slim`.
+  - Instalación limpia de dependencias desde `requirements.txt`.
+  - Healthcheck integrado con curl contra el puerto 8000.
+  - Creación automática del directorio persistente `/app/static/uploads`.
+- **Creación de .dockerignore**:
+  - Exclusión de `venv/`, `__pycache__/`, `.git/` y artefactos temporales para optimizar el peso de la imagen de Docker.
+- **Creación de docker-compose.yml**:
+  - Definición de servicios `web` y `ollama` con volúmenes persistentes para la base de datos (`/app/pedidos.db`), fotos (`/app/static/uploads`) y modelos de IA (`/root/.ollama`).
+- **Flexibilidad de Variables de Entorno en Backend**:
+  - `main.py` ahora acepta tanto `OLLAMA_HOST` (estándar de Docker/Easypanel) como `OLLAMA_BASE_URL`, añadiendo automáticamente `/v1` si es necesario.
+  - `database.py` ahora lee `DATABASE_URL` para permitir configurar la ruta del archivo SQLite montado en volumen persistente.
+
+---
+
 ## 7. Guía de Ejecución y Pruebas para Agentes
 
 1. **Iniciar Servidor Local**:

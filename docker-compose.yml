@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - MODEL_NAME=llama3.2:1b
+    volumes:
+      - cliff-data:/app/pedidos.db
+      - cliff-uploads:/app/static/uploads
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  cliff-data:
+  cliff-uploads:
+  ollama-models:

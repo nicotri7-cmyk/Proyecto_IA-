@@ -1,15 +1,17 @@
 """
 database.py
 Configuración de la conexión a la base de datos SQLite con SQLAlchemy.
+Compatible con despliegues locales y contenedores Docker / Easypanel.
 """
 
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-DATABASE_URL = "sqlite:///./pedidos.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./pedidos.db")
 
-# connect_args={"check_same_thread": False} es necesario para SQLite en entornos multihilo como FastAPI
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
