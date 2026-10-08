@@ -1,0 +1,55 @@
+========================================================================
+  KIOSCO DE PEDIDOS POR VOZ CON IA (VOICE BISTRO)
+========================================================================
+
+Este proyecto está diseñado para funcionar de manera local e independiente
+en cualquier computadora (Windows, Linux o macOS).
+
+------------------------------------------------------------------------
+REQUISITOS PREVIOS EN EL EQUIPO (Solo se instalan una vez)
+------------------------------------------------------------------------
+1. Python 3.10 o superior (descargar de https://www.python.org/)
+   * En Windows: Marcar la casilla "Add Python to PATH" al instalar.
+
+2. Ollama (descargar de https://ollama.com/)
+   * Ollama se encarga de ejecutar el modelo de lenguaje local con
+     aceleración gráfica (GPU) nativa.
+
+------------------------------------------------------------------------
+CÓMO INICIAR EL PROYECTO (1 SOLO CLIC)
+------------------------------------------------------------------------
+
+* En WINDOWS:
+  Haz doble clic en el archivo:
+  👉 iniciar.bat
+
+* En LINUX / macOS:
+  Abre una terminal en esta carpeta y ejecuta:
+  👉 ./iniciar.sh
+
+El script se encargará automáticamente de:
+- Verificar que Python y Ollama estén presentes.
+- Descargar el modelo 'llama3.2:1b' en Ollama si aún no lo tienes.
+- Crear el entorno virtual e instalar todas las dependencias.
+- Iniciar el servidor web y abrir el navegador en:
+  * Kiosco de Autoservicio:  http://localhost:8000
+  * Panel de Administración: http://localhost:8000/admin
+
+------------------------------------------------------------------------
+PANEL DE ADMINISTRACIÓN (/admin)
+------------------------------------------------------------------------
+Incluye una interfaz gráfica completa para el administrador donde puedes:
+- Ver estadísticas en vivo (productos, stock total, agotados, valor).
+- Agregar nuevos productos con fotografía (subida de archivos o URL).
+- Modificar precios y stock en tiempo real con controles rápidos (+ / -).
+- Filtrar y buscar productos por categoría o disponibilidad.
+
+------------------------------------------------------------------------
+BASE DE DATOS Y PORTABILIDAD
+------------------------------------------------------------------------
+La base de datos es SQLite local y está almacenada en:
+- pedidos.db
+
+No necesitas instalar MySQL ni ningún otro motor de base de datos.
+Toda la información de productos, ingredientes y pedidos viaja dentro
+de esta misma carpeta.

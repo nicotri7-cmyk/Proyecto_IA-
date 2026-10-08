@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLIFF | Sandwichería & Kiosco de Autoservicio</title>
+  <meta name="description" content="Kiosco de autoservicio inteligente CLIFF con IA local (llama3.2:1b), control de stock en tiempo real y pedidos por voz." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="kiosk-app-root">
+
+    <!-- =========================================================
+         1. PANTALLA DE BIENVENIDA / INICIO (CLIFF BRAND)
+         ========================================================= -->
+    <section id="view-welcome" class="kiosk-view view-welcome active" aria-label="Pantalla de bienvenida">
+      <!-- Acceso discreto para administración y botones superiores -->
+      <header class="welcome-top-bar">
+        <div class="kiosk-location-tag">
+          <span class="pulse-dot"></span>
+          <span>Totem Kiosco #01 • Mesa K1</span>
+        </div>
+        <div class="welcome-top-actions">
+          <button id="btn-share-welcome" class="btn-cliff-share" type="button" title="Compartir enlace">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Compartir</span>
+          </button>
+          <a href="https://wa.me/?text=Hola%20CLIFF!%20Quiero%20consultar%20sobre%20el%20menú" target="_blank" rel="noopener" class="btn-cliff-whatsapp" title="WhatsApp CLIFF">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.879-2.056-.98-.276-.1-.477-.15-.678.15-.2.302-.779.98-.955 1.181-.176.201-.352.226-.653.076-.301-.15-1.272-.469-2.423-1.496-.896-.799-1.501-1.786-1.677-2.088-.176-.302-.019-.465.132-.615.136-.135.301-.352.452-.528.15-.176.2-.301.301-.502.1-.201.05-.377-.025-.528-.076-.151-.678-1.633-.929-2.236-.245-.588-.494-.508-.678-.518l-.578-.01c-.201 0-.528.076-.804.377-.276.302-1.055 1.03-1.055 2.512 0 1.482 1.08 2.914 1.231 3.115.15.201 2.125 3.245 5.148 4.551.719.311 1.28.497 1.718.636.722.229 1.379.197 1.9.119.58-.088 1.78-.728 2.031-1.431.251-.703.251-1.306.176-1.431-.075-.126-.276-.201-.577-.352z"/></svg>
+            <span>WhatsApp</span>
+          </a>
+          <a href="/admin" class="btn-admin-pill btn-admin-nav" title="Panel de Administración">
+            <span>⚙️</span>
+            <span>Admin</span>
+          </a>
+        </div>
+      </header>
+
+      <div class="welcome-hero-card">
+        <!-- Logo CLIFF circular estilo sello de marca -->
+        <div class="welcome-logo-placeholder">
+          <div class="cliff-seal-circle">
+            <span class="cliff-seal-inner">CLIFF</span>
+          </div>
+          <div class="logo-info-wrap">
+            <h1 class="welcome-brand-title">CLIFF</h1>
+            <span class="welcome-logo-badge">SANDWICHERÍA TRADICIONAL & KIOSCO IA</span>
+          </div>
+        </div>
+
+        <!-- Título principal de bienvenida -->
+        <div class="welcome-heading-group">
+          <h2 class="welcome-display-title">¡Bienvenido a CLIFF!</h2>
+          <p class="welcome-subtitle">Elige cómo deseas ordenar tus sandwiches y combos hoy:</p>
+        </div>
+
+        <!-- Dos Botones Gigantes Principales -->
+        <div class="welcome-action-buttons">
+          <!-- Botón 1: Autoservicio IA -->
+          <button id="btn-goto-ai" class="btn-totem-card btn-totem-ai" type="button" aria-label="Ingresar a Autoservicio con Inteligencia Artificial">
+            <div class="totem-card-glow"></div>
+            <div class="totem-card-icon-wrap ai-icon-bg">
+              <span class="totem-icon">🤖</span>
+              <span class="icon-sparkle">✨</span>
+            </div>
+            <div class="totem-card-text">
+              <span class="totem-card-tag">Recomendado • Rápido por Voz</span>
+              <h3 class="totem-card-title">Autoservicio IA</h3>
+              <p class="totem-card-desc">Habla con nuestra IA para pedir combos, sugerencias y armar sandwiches a tu gusto.</p>
+            </div>
+            <div class="totem-card-arrow">→</div>
+          </button>
+
+          <!-- Botón 2: Menú Tradicional -->
+          <button id="btn-goto-menu" class="btn-totem-card btn-totem-menu" type="button" aria-label="Ver Menú Tradicional estilo Totem">
+            <div class="totem-card-glow"></div>
+            <div class="totem-card-icon-wrap menu-icon-bg">
+              <span class="totem-icon">🥪</span>
+            </div>
+            <div class="totem-card-text">
+              <span class="totem-card-tag">Catálogo Visual Táctil</span>
+              <h3 class="totem-card-title">Carta CLIFF</h3>
+              <p class="totem-card-desc">Explora la carta tradicional con nuestros sandwiches, combos y papas estilo totem.</p>
+            </div>
+            <div class="totem-card-arrow">→</div>
+          </button>
+        </div>
+
+        <div class="welcome-footer-notes">
+          <span>💳 Pago con tarjeta y transferencia en totem</span>
+          <span>•</span>
+          <span>🌱 Envases 100% reciclables y ecológicos</span>
+          <span>•</span>
+          <span>⚡ Stock verificado en tiempo real</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         2. PANTALLA DE AUTOSERVICIO IA (IMAGEN 2)
+         ========================================================= -->
+    <section id="view-ai-kiosk" class="kiosk-view view-ai-kiosk" style="display: none;" aria-label="Pantalla de Autoservicio IA">
+      <!-- Barra superior de navegación del Autoservicio IA -->
+      <header class="kiosk-subnav">
+        <button id="btn-ai-back-welcome" class="btn-nav-back" type="button">
+          <span>←</span>
+          <span>Volver al Inicio</span>
+        </button>
+
+        <div class="subnav-brand">
+          <div class="cliff-header-logo-wrap">
+            <span class="cliff-seal-nav-mini">CLIFF</span>
+          </div>
+          <div class="subnav-brand-text">
+            <strong>Autoservicio IA</strong>
+            <span id="ticket-session-id">Sesión #K1</span>
+          </div>
+        </div>
+
+        <div class="subnav-controls">
+          <button id="btn-share-ai" class="btn-cliff-share" type="button" title="Compartir">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Compartir</span>
+          </button>
+          <a href="https://wa.me/?text=Hola%20CLIFF!%20Estoy%20ordenando%20en%20el%20kiosco" target="_blank" rel="noopener" class="btn-cliff-whatsapp" title="WhatsApp CLIFF">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.879-2.056-.98-.276-.1-.477-.15-.678.15-.2.302-.779.98-.955 1.181-.176.201-.352.226-.653.076-.301-.15-1.272-.469-2.423-1.496-.896-.799-1.501-1.786-1.677-2.088-.176-.302-.019-.465.132-.615.136-.135.301-.352.452-.528.15-.176.2-.301.301-.502.1-.201.05-.377-.025-.528-.076-.151-.678-1.633-.929-2.236-.245-.588-.494-.508-.678-.518l-.578-.01c-.201 0-.528.076-.804.377-.276.302-1.055 1.03-1.055 2.512 0 1.482 1.08 2.914 1.231 3.115.15.201 2.125 3.245 5.148 4.551.719.311 1.28.497 1.718.636.722.229 1.379.197 1.9.119.58-.088 1.78-.728 2.031-1.431.251-.703.251-1.306.176-1.431-.075-.126-.276-.201-.577-.352z"/></svg>
+            <span>WhatsApp</span>
+          </a>
+
+          <button id="btn-toggle-voice" class="btn-icon-subnav" title="Silenciar / Activar Voz" aria-label="Control de voz">
+            <span id="voice-icon">🔊</span>
+            <span id="voice-label" class="btn-label-hidden">Voz Activa</span>
+          </button>
+
+          <button id="btn-nuevo-pedido" class="btn-icon-subnav" title="Reiniciar orden y pedir de cero">
+            <span>🔄</span>
+            <span class="btn-label-hidden">Reiniciar</span>
+          </button>
+
+          <div class="system-badge" id="system-badge" title="Estado de la IA Local">
+            <span class="pulse-dot"></span>
+            <span class="badge-text" id="engine-status-text">llama3.2:1b</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- CUADRO CENTRAL ("Aquí dentro va lo que ofrece la IA" - Imagen 2) -->
+      <main class="ai-screen-content">
+        <div class="ai-central-box" id="ai-central-box">
+          <!-- MENSAJE DE ESTADO / RESPUESTA DEL ASISTENTE IA -->
+          <div class="ai-speech-bubble" id="ai-speech-bubble">
+            <span class="ai-avatar-icon">🤖</span>
+            <p id="ai-response-text">¡Hola! Presiona el micrófono abajo para ordenar por voz tu pedido.</p>
+          </div>
+
+          <!-- ESTADO INICIAL / PROMPT CUANDO NO HAY TARJETAS AÚN -->
+          <div class="ai-empty-prompt" id="ai-empty-prompt">
+            <span class="empty-prompt-icon">🍽️</span>
+            <h3>Aquí verás lo que te ofrece la IA</h3>
+            <p>Pídele a la IA por voz lo que deseas consumir (ej: "¿Qué opciones vegetarianas hay?" o "Quiero una hamburguesa clásica con papas").</p>
+          </div>
+
+          <!-- SECCIÓN DINÁMICA: TARJETAS DE PRODUCTOS OFRECIDOS POR LA IA -->
+          <div class="ai-offered-section" id="ai-offered-section" style="display: none;">
+            <div class="ai-offered-header">
+              <div class="ai-offered-title-group">
+                <span class="ai-sparkle-badge">🍽️ Productos Recomendados por la IA</span>
+                <span class="ai-offered-hint">Toca cualquier tarjeta para agregarla a tu pedido</span>
+              </div>
+              <button type="button" class="btn-clean-offered" id="btn-clean-offered" title="Ocultar recomendaciones">✕</button>
+            </div>
+            <div class="ai-cards-grid" id="ai-cards-grid">
+              <!-- Renderizado dinámico desde app.js -->
+            </div>
+          </div>
+
+          <!-- Entrada de texto como respaldo accesible (Deshabilitada temporalmente; reactivar cambiando style="display: none;" por style="display: flex;") -->
+          <form class="text-input-bar" id="chat-form" style="display: none;">
+            <input 
+              type="text" 
+              id="user-text-input" 
+              placeholder="O escribe aquí tu pedido (ej: 'Quiero una hamburguesa clásica y papas')..." 
+              autocomplete="off"
+              disabled
+            />
+            <button type="submit" id="btn-send-text" class="btn-send" aria-label="Enviar mensaje" disabled>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- BARRA INFERIOR CON DOS BOTONES GIGANTES (IMAGEN 2: MICRÓFONO Y CARRITO) -->
+        <footer class="ai-bottom-actions-bar">
+          <!-- Botón 1 (Izquierda): MICRÓFONO GIGANTE -->
+          <div class="mic-action-container">
+            <div class="sound-wave-container" id="sound-wave">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+            </div>
+            <div class="big-mic-wrapper">
+              <div class="mic-ring ring-1"></div>
+              <div class="mic-ring ring-2"></div>
+              <button id="btn-mic" class="big-mic-button" type="button" aria-label="Presiona para hablar" title="Presiona para hablar con la IA">
+                <svg class="mic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                  <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+            <span class="action-btn-caption" id="mic-caption-text">🎙️ Toca para Hablar</span>
+          </div>
+
+          <!-- Botón 2 (Derecha): CARRITO GIGANTE -->
+          <div class="cart-action-container">
+            <button id="btn-ai-open-cart" class="big-cart-button" type="button" aria-label="Ver carrito de compras">
+              <div class="cart-icon-wrapper">
+                <span class="big-cart-emoji">🛒</span>
+                <span class="cart-badge-count" id="ai-cart-count-badge">0</span>
+              </div>
+              <div class="cart-btn-details">
+                <span class="cart-btn-label">Mi Pedido</span>
+                <span class="cart-btn-total" id="ai-cart-total-badge">$0 CLP</span>
+              </div>
+            </button>
+            <span class="action-btn-caption">🛒 Ver Carrito y Pagar</span>
+          </div>
+        </footer>
+      </main>
+    </section>
+
+    <!-- =========================================================
+         3. PANTALLA DE CARTA CLIFF (DISEÑO IDÉNTICO A LA REFERENCIA)
+         ========================================================= -->
+    <section id="view-traditional-menu" class="kiosk-view view-traditional-menu" style="display: none;" aria-label="Carta de Menú CLIFF">
+      <!-- Barra superior de navegación profunda estilo CLIFF -->
+      <header class="kiosk-subnav">
+        <button id="btn-menu-back-welcome" class="btn-nav-back" type="button">
+          <span>←</span>
+          <span>Volver al Inicio</span>
+        </button>
+
+        <div class="subnav-brand">
+          <div class="cliff-header-logo-wrap">
+            <span class="cliff-seal-nav-mini">CLIFF</span>
+          </div>
+          <div class="subnav-brand-text">
+            <strong>Carta CLIFF</strong>
+            <span>Sandwiches & Combos</span>
+          </div>
+        </div>
+
+        <div class="subnav-controls">
+          <button id="btn-share-menu" class="btn-cliff-share" type="button" title="Compartir carta">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Compartir</span>
+          </button>
+          <a href="https://wa.me/?text=Hola%20CLIFF!%20Quiero%20hacer%20un%20pedido" target="_blank" rel="noopener" class="btn-cliff-whatsapp" title="WhatsApp CLIFF">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.879-2.056-.98-.276-.1-.477-.15-.678.15-.2.302-.779.98-.955 1.181-.176.201-.352.226-.653.076-.301-.15-1.272-.469-2.423-1.496-.896-.799-1.501-1.786-1.677-2.088-.176-.302-.019-.465.132-.615.136-.135.301-.352.452-.528.15-.176.2-.301.301-.502.1-.201.05-.377-.025-.528-.076-.151-.678-1.633-.929-2.236-.245-.588-.494-.508-.678-.518l-.578-.01c-.201 0-.528.076-.804.377-.276.302-1.055 1.03-1.055 2.512 0 1.482 1.08 2.914 1.231 3.115.15.201 2.125 3.245 5.148 4.551.719.311 1.28.497 1.718.636.722.229 1.379.197 1.9.119.58-.088 1.78-.728 2.031-1.431.251-.703.251-1.306.176-1.431-.075-.126-.276-.201-.577-.352z"/></svg>
+            <span>WhatsApp</span>
+          </a>
+          <button id="btn-menu-open-cart" class="btn-subnav-cart" type="button">
+            <span>🛒</span>
+            <span class="subnav-cart-count" id="menu-cart-count-badge">0</span>
+            <span class="subnav-cart-total" id="menu-cart-total-badge">$0 CLP</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Layout con Sidebar de Categorías (Imagen de Referencia) -->
+      <div class="cliff-menu-layout">
+        <!-- Sidebar de Categorías -->
+        <aside class="cliff-categories-sidebar" aria-label="Categorías del Menú">
+          <nav class="cliff-categories-list">
+            <button class="cat-tab-btn active" data-categoria="Sandwiches">Sandwiches</button>
+            <button class="cat-tab-btn" data-categoria="Hamburguesas">Hamburguesas</button>
+            <button class="cat-tab-btn tab-sandwich-highlight" data-categoria="Sandwiches Custom">🥪 Armar Sandwich</button>
+            <button class="cat-tab-btn" data-categoria="Acompañamientos">Papas & Extras</button>
+            <button class="cat-tab-btn" data-categoria="Bebidas">Bebidas</button>
+            <button class="cat-tab-btn" data-categoria="Panes">Panes</button>
+            <button class="cat-tab-btn" data-categoria="Proteínas">Proteínas</button>
+            <button class="cat-tab-btn" data-categoria="Agregados">Agregados</button>
+            <button class="cat-tab-btn" data-categoria="Salsas">Salsas</button>
+            <button class="cat-tab-btn" data-categoria="TODOS">Todos</button>
+          </nav>
+        </aside>
+
+        <!-- Columna Principal con Título de Categoría y Tarjetas Horizontales -->
+        <main class="cliff-catalog-content">
+          <div class="cliff-section-header">
+            <h2 class="cliff-section-title" id="cliff-current-category-heading">— Sandwiches</h2>
+          </div>
+          <div class="totem-products-grid" id="totem-products-grid">
+            <div class="catalog-loading">Cargando carta de CLIFF...</div>
+          </div>
+        </main>
+      </div>
+
+      <!-- Botón flotante inferior derecho con lupa de búsqueda -->
+      <button class="cliff-floating-search-btn" id="cliff-floating-search-btn" type="button" title="Ir a Autoservicio IA" aria-label="Buscar o hablar con IA">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+    </section>
+
+    <!-- =========================================================
+         4. CAJÓN LATERAL DEL CARRITO / TICKET DE PEDIDO (SLIDE-OVER)
+         ========================================================= -->
+    <div id="cart-drawer" class="cart-drawer-overlay" style="display: none;" aria-label="Detalle de tu pedido">
+      <div class="cart-drawer-card">
+        <div class="drawer-header">
+          <div class="drawer-title-group">
+            <h3>🛒 Tu Pedido Actual</h3>
+            <span class="drawer-session-tag" id="drawer-session-tag">Mesa #K1</span>
+          </div>
+          <button id="btn-close-cart" class="btn-drawer-close" type="button" title="Cerrar carrito">✕</button>
+        </div>
+
+        <div class="drawer-body">
+          <table class="order-table" id="order-table">
+            <thead>
+              <tr>
+                <th scope="col" class="th-prod">Producto</th>
+                <th scope="col" class="th-qty">Cant.</th>
+                <th scope="col" class="th-unit">Unit.</th>
+                <th scope="col" class="th-sub">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody id="order-items-tbody">
+              <!-- Renderizado dinámico desde app.js -->
+              <tr class="empty-order-row">
+                <td colspan="4">
+                  <div class="empty-order-state">
+                    <span class="empty-icon">🛒</span>
+                    <p>Aún no has agregado productos a tu orden.</p>
+                    <small>Habla con la IA o explora el menú tradicional.</small>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="drawer-footer">
+          <div class="drawer-summary">
+            <div class="summary-row">
+              <span>Total de productos:</span>
+              <strong id="summary-total-items">0 unid.</strong>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="total-row">
+              <span class="total-label">Total a Pagar:</span>
+              <span class="total-amount" id="summary-total-amount">$0 CLP</span>
+            </div>
+          </div>
+
+          <div class="drawer-actions">
+            <button id="btn-confirmar-pedido" class="btn-primary btn-checkout" disabled>
+              <span>💳</span>
+              <span>Confirmar y Pagar</span>
+            </button>
+            <button id="btn-keep-ordering" class="btn-secondary" type="button">
+              <span>Seguir Pidiendo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         5. MODAL DE ARMADO DE SANDWICH PERSONALIZADO (PASO A PASO)
+         ========================================================= -->
+    <div class="modal-backdrop modal-custom-builder-backdrop" id="modal-custom-sandwich" style="display: none;" aria-label="Armador de Sandwich Personalizado">
+      <div class="modal-custom-builder-card">
+        <!-- Encabezado del Modal -->
+        <div class="builder-header">
+          <div class="builder-title-group">
+            <span class="builder-pill-badge">🥪 Personalización a Tu Gusto</span>
+            <h2 class="builder-main-title">Arma tu Sandwich Personalizado</h2>
+            <p class="builder-subtitle">Selecciona primero tu base (pan obligatorio) y luego elige los ingredientes frescos que desees.</p>
+          </div>
+          <button type="button" class="btn-builder-close" id="btn-close-custom-builder" title="Cerrar armador">✕</button>
+        </div>
+
+        <!-- Indicador de Pasos -->
+        <div class="builder-steps-indicator">
+          <div class="builder-step active" id="step-ind-1">
+            <span class="step-num">1</span>
+            <div class="step-label-wrap">
+              <strong>Paso 1: Pan / Base</strong>
+              <small>Obligatorio para iniciar</small>
+            </div>
+          </div>
+          <div class="builder-step-separator">→</div>
+          <div class="builder-step locked" id="step-ind-2">
+            <span class="step-num">2</span>
+            <div class="step-label-wrap">
+              <strong>Paso 2: Ingredientes</strong>
+              <small id="step-2-subtitle">Desbloqueable al elegir pan</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido Desplazable del Armador -->
+        <div class="builder-scroll-content">
+          <!-- SECCIÓN PASO 1: SELECCIÓN DE BASE (PAN) -->
+          <section class="builder-section" id="section-step-base">
+            <div class="builder-section-header">
+              <div class="section-title-wrap">
+                <span class="section-icon">🥖</span>
+                <h3>Paso 1: Elige tu Pan (Base Obligatoria)</h3>
+              </div>
+              <span class="section-status-badge required" id="base-status-badge">Selección obligatoria</span>
+            </div>
+            <p class="section-hint">Debes escoger una de nuestras opciones de pan horneado fresco antes de continuar:</p>
+            
+            <div class="builder-grid builder-bases-grid" id="builder-bases-grid">
+              <!-- Renderizado dinámicamente por app.js -->
+              <div class="catalog-loading">Cargando opciones de pan...</div>
+            </div>
+          </section>
+
+          <!-- SECCIÓN PASO 2: SELECCIÓN DE INGREDIENTES -->
+          <section class="builder-section builder-section-locked" id="section-step-ingredients">
+            <div class="builder-section-header">
+              <div class="section-title-wrap">
+                <span class="section-icon">🥗</span>
+                <h3>Paso 2: Elige tus Ingredientes Favoritos</h3>
+              </div>
+              <span class="section-status-badge" id="ingredients-count-badge">0 seleccionados</span>
+            </div>
+            <p class="section-hint" id="ingredients-hint">Selecciona todas las proteínas, quesos, agregados y salsas que deseas incluir en tu sandwich:</p>
+
+            <!-- Aviso bloqueado hasta elegir pan -->
+            <div class="builder-locked-overlay" id="builder-locked-overlay">
+              <div class="locked-box">
+                <span class="locked-icon">🔒</span>
+                <h4>Primero debes escoger tu pan</h4>
+                <p>Haz clic en cualquiera de las opciones de pan de arriba para desbloquear todos los ingredientes frescos disponibles.</p>
+              </div>
+            </div>
+
+            <!-- Grilla con todos los ingredientes -->
+            <div class="builder-grid builder-ingredients-grid" id="builder-ingredients-grid">
+              <!-- Renderizado dinámicamente por app.js tras elegir base -->
+            </div>
+          </section>
+        </div>
+
+        <!-- Barra Inferior de Resumen y Confirmación -->
+        <div class="builder-footer-bar">
+          <div class="builder-summary-info">
+            <div class="summary-line-base">
+              <span class="summary-label">Pan elegido:</span>
+              <strong id="builder-selected-base-name">Ninguno seleccionado aún</strong>
+            </div>
+            <div class="summary-line-ingredients">
+              <span class="summary-label">Ingredientes:</span>
+              <span id="builder-selected-ingredients-summary">0 adicionales</span>
+            </div>
+          </div>
+
+          <div class="builder-actions-group">
+            <div class="builder-total-price-wrap">
+              <span class="price-label">Precio del Sandwich:</span>
+              <span class="builder-total-price" id="builder-total-price">$0 CLP</span>
+            </div>
+            <button type="button" class="btn-builder-add" id="btn-builder-confirm" disabled>
+              <span>🥪</span>
+              <span>Agregar al Pedido</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         6. PANTALLA DE PAGO CLIFF (CHECKOUT / MÉTODOS DE PAGO)
+         ========================================================= -->
+    <div class="modal-backdrop modal-pago-backdrop" id="modal-pago" style="display: none;" aria-label="Pantalla de Pago CLIFF">
+      <div class="modal-card modal-pago-card">
+        <div class="modal-pago-header">
+          <div class="pago-brand-group">
+            <div class="cliff-seal-nav-mini">CLIFF</div>
+            <div>
+              <h3 class="modal-pago-title">Pantalla de Pago</h3>
+              <p class="modal-pago-subtitle">Revisa tu orden y selecciona tu método de pago</p>
+            </div>
+          </div>
+          <button type="button" class="btn-builder-close" id="btn-cerrar-pago" title="Volver al pedido">✕</button>
+        </div>
+
+        <div class="modal-pago-body">
+          <!-- Resumen de Pedido -->
+          <div class="pago-summary-card">
+            <div class="pago-summary-head">
+              <span class="pago-summary-label">🛒 Detalle de tu Pedido:</span>
+              <span class="pago-summary-count" id="pago-items-count">0 productos</span>
+            </div>
+            <div class="pago-items-list" id="pago-items-list">
+              <!-- Renderizado dinámicamente con los productos -->
+            </div>
+            <div class="pago-divider"></div>
+            <div class="pago-total-row">
+              <span class="pago-total-label">Total a Pagar:</span>
+              <strong class="pago-total-amount" id="pago-total-amount">$0 CLP</strong>
+            </div>
+          </div>
+
+          <!-- Selección de Método de Pago -->
+          <div class="pago-methods-section">
+            <h4 class="pago-methods-title">Selecciona tu Medio de Pago:</h4>
+            <div class="pago-methods-grid">
+              <label class="pago-method-card active">
+                <input type="radio" name="metodo-pago" value="pos" checked />
+                <span class="method-icon">💳</span>
+                <div class="method-info">
+                  <strong class="method-name">Tarjeta Débito / Crédito</strong>
+                  <span class="method-desc">T.O.S. Transbank / Totem</span>
+                </div>
+              </label>
+              <label class="pago-method-card">
+                <input type="radio" name="metodo-pago" value="qr" />
+                <span class="method-icon">📱</span>
+                <div class="method-info">
+                  <strong class="method-name">QR / Transferencia</strong>
+                  <span class="method-desc">MercadoPago / Banco</span>
+                </div>
+              </label>
+              <label class="pago-method-card">
+                <input type="radio" name="metodo-pago" value="efectivo" />
+                <span class="method-icon">💵</span>
+                <div class="method-info">
+                  <strong class="method-name">Efectivo en Caja</strong>
+                  <span class="method-desc">Pagar al retirar turno</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Mensaje Ecológico de Cliff -->
+          <div class="pago-eco-banner">
+            <span class="eco-banner-icon">🌱</span>
+            <div class="eco-banner-text">
+              <strong>Compromiso Ecológico CLIFF</strong>
+              <p>Muchas gracias por comprar en Cliff, recuerda que nuestros envases son reciclables y ecológicos.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-pago-footer">
+          <button type="button" class="btn-secondary" id="btn-cancelar-pago">
+            <span>← Seguir Pidiendo</span>
+          </button>
+          <button type="button" class="btn-primary btn-pago-confirm" id="btn-finalizar-pago-ahora">
+            <span>💳 Pagar y Confirmar Orden</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         7. MODAL DE CONFIRMACIÓN DE PAGO (GRACIAS POR COMPRAR EN CLIFF)
+         ========================================================= -->
+    <div class="modal-backdrop" id="modal-confirmacion" style="display: none;">
+      <div class="modal-card modal-confirmacion-card">
+        <div class="cliff-seal-nav-mini" style="font-size: 1.25rem; padding: 0.5rem 1.2rem; margin-bottom: 0.5rem;">CLIFF</div>
+        <div class="modal-icon">🎉</div>
+        <h3 class="modal-confirm-title">¡Muchas gracias por comprar en Cliff!</h3>
+        <div class="modal-eco-highlight">
+          <span>🌿 Recuerda que nuestros envases son reciclables y ecológicos.</span>
+        </div>
+        <p id="modal-resumen-texto">Tu orden ha sido enviada a cocina. El stock local se ha descontado correctamente en SQLite.</p>
+        <div class="modal-total-box" id="modal-total-box">$0 CLP</div>
+        <button id="btn-cerrar-modal" class="btn-primary">Aceptar y Finalizar</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Administración | CLIFF Sandwichería</title>
+  <meta name="description" content="Panel de administración gráfico para gestionar productos, precios, stock e imágenes en SQLite para CLIFF Sandwichería." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    /* =========================================================
+       ESTILOS EXCLUSIVOS DEL PANEL DE ADMINISTRACIÓN
+       ========================================================= */
+    .admin-app {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.1rem 1.75rem;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--bg-card-border);
+      box-shadow: var(--shadow-card);
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .admin-brand-icon {
+      font-size: 2.2rem;
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-title-wrap h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #f8fafc, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .admin-title-wrap .admin-sub {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .admin-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .btn-back-kiosk {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      padding: 0.55rem 1.1rem;
+      border-radius: var(--radius-full);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 700;
+      transition: var(--transition-normal);
+    }
+
+    .btn-back-kiosk:hover {
+      background: rgba(16, 185, 129, 0.28);
+      box-shadow: 0 0 16px var(--accent-emerald-glow);
+      transform: translateY(-1px);
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.1rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: var(--transition-normal);
+      box-shadow: var(--shadow-card);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .kpi-icon.blue { background: rgba(6, 182, 212, 0.15); color: #22d3ee; }
+    .kpi-icon.green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .kpi-icon.yellow { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .kpi-icon.red { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .kpi-icon.purple { background: rgba(139, 92, 246, 0.15); color: #c084fc; }
+
+    .kpi-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1.15;
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    /* Toolbar */
+    .admin-toolbar {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 260px;
+      flex: 1;
+      max-width: 380px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-primary);
+      padding: 0.6rem 1rem 0.6rem 2.4rem;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      transition: var(--transition-normal);
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.25);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .filter-select {
+      background: var(--bg-input);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-primary);
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+
+    .filter-select:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-create {
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #041d1a;
+      border: none;
+      padding: 0.6rem 1.25rem;
+      border-radius: var(--radius-full);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      transition: var(--transition-normal);
+    }
+
+    .btn-create:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+      filter: brightness(1.08);
+    }
+
+    .view-toggle-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-secondary);
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-full);
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+
+    .view-toggle-btn.active {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: rgba(6, 182, 212, 0.4);
+      color: #22d3ee;
+      font-weight: 700;
+    }
+
+    /* Grid de Productos Admin */
+    .admin-products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .admin-prod-card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-card);
+      transition: var(--transition-normal);
+      position: relative;
+    }
+
+    .admin-prod-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.6);
+    }
+
+    .admin-prod-card.out-of-stock {
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .admin-prod-card.low-stock {
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .admin-card-img-box {
+      width: 100%;
+      height: 165px;
+      position: relative;
+      background: rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+    }
+
+    .admin-card-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .admin-prod-card:hover .admin-card-img-box img {
+      transform: scale(1.05);
+    }
+
+    .admin-img-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(16, 185, 129, 0.1));
+    }
+
+    .admin-cat-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(18, 24, 38, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .admin-id-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .admin-card-content {
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 0.85rem;
+    }
+
+    .admin-prod-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    /* Controles rápidos de Precio y Stock */
+    .admin-quick-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      background: rgba(13, 18, 30, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+    }
+
+    .quick-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .quick-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+    }
+
+    .quick-price-box {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .quick-stock-stepper {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-step {
+      width: 26px;
+      height: 26px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+
+    .btn-step:hover {
+      background: var(--accent-cyan);
+      color: #04271f;
+    }
+
+    .stock-input-mini {
+      width: 44px;
+      text-align: center;
+      background: var(--bg-input);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 0.2rem 0;
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+
+    .admin-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-admin-action {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-secondary);
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: var(--transition-normal);
+    }
+
+    .btn-admin-action:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-primary);
+    }
+
+    .btn-admin-action.btn-delete:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+
+    .btn-admin-action.btn-status-deactivate {
+      color: #cbd5e1;
+      border-color: rgba(148, 163, 184, 0.25);
+      background: rgba(148, 163, 184, 0.08);
+    }
+
+    .btn-admin-action.btn-status-deactivate:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+    }
+
+    .btn-admin-action.btn-status-activate {
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.12);
+    }
+
+    .btn-admin-action.btn-status-activate:hover {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #6ee7b7;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .status-badge.badge-active {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.badge-out {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .status-badge.badge-low {
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-badge.badge-inactive {
+      color: #94a3b8;
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+    }
+
+    .admin-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.22rem 0.6rem;
+      border-radius: var(--radius-full);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-role-base {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+    }
+
+    .badge-role-ingrediente {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+    }
+
+    .badge-role-none {
+      color: #94a3b8;
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .admin-diet-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.18rem 0.5rem;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-diet-vegano {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.12);
+    }
+
+    .badge-diet-vegetariano {
+      color: #84cc16;
+      background: rgba(132, 204, 22, 0.16);
+      border: 1px solid rgba(132, 204, 22, 0.45);
+      box-shadow: 0 0 8px rgba(132, 204, 22, 0.12);
+    }
+
+    .admin-prod-card.card-inactive {
+      opacity: 0.62;
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    .admin-prod-card.card-inactive .admin-card-img-box img {
+      filter: grayscale(0.85);
+    }
+
+    .admin-status-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(15, 23, 42, 0.88);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      padding: 0.35rem 0.8rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Tabla Admin */
+    .admin-table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-lg);
+      overflow-x: auto;
+      box-shadow: var(--shadow-card);
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .admin-table th {
+      background: rgba(13, 18, 30, 0.85);
+      padding: 1rem 1.1rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--bg-card-border);
+    }
+
+    .admin-table td {
+      padding: 0.85rem 1.1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .admin-table tr.row-inactive td {
+      background: rgba(15, 23, 42, 0.45);
+      color: #94a3b8;
+    }
+
+    .admin-table tr.row-inactive:hover td {
+      background: rgba(30, 41, 59, 0.5);
+    }
+
+    .admin-table tr.row-inactive .table-thumb {
+      filter: grayscale(0.85);
+      opacity: 0.65;
+    }
+
+    .table-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Modal Formulario */
+    .admin-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .admin-modal-card {
+      background: #0f1523;
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(6, 182, 212, 0.15);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes scaleUp {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 0.85rem;
+    }
+
+    .modal-header-row h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .btn-close-modal {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      transition: var(--transition-normal);
+    }
+
+    .btn-close-modal:hover {
+      color: #f87171;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .form-group label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .form-control {
+      background: var(--bg-input);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-primary);
+      padding: 0.65rem 0.95rem;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition-normal);
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.2);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Subida de Imagen */
+    .image-picker-zone {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      text-align: center;
+      background: rgba(13, 18, 30, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      transition: var(--transition-normal);
+      cursor: pointer;
+    }
+
+    .image-picker-zone:hover, .image-picker-zone.dragover {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.05);
+    }
+
+    .image-preview-box {
+      width: 100%;
+      height: 140px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      display: none;
+    }
+
+    .image-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .btn-remove-preview {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(239, 68, 68, 0.85);
+      color: #fff;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.85rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 1.1rem;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      z-index: 2000;
+    }
+
+    .toast {
+      background: rgba(18, 24, 38, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      color: var(--text-primary);
+      font-size: 0.86rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      animation: slideInRight 0.3s ease;
+    }
+
+    .toast.success { border-color: rgba(16, 185, 129, 0.5); color: #34d399; }
+    .toast.error { border-color: rgba(239, 68, 68, 0.5); color: #f87171; }
+
+    @keyframes slideInRight {
+      from { transform: translateX(50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-app">
+    <!-- Header Admin -->
+    <header class="admin-header">
+      <div class="admin-brand">
+        <div class="admin-brand-icon">⚙️</div>
+        <div class="admin-title-wrap">
+          <h1>Panel de Administración</h1>
+          <span class="admin-sub">Gestión de Catálogo, Precios, Stock e Imágenes en SQLite (pedidos.db)</span>
+        </div>
+      </div>
+
+      <div class="admin-nav-actions">
+        <a href="/" class="btn-back-kiosk" title="Regresar al Kiosco de Autoservicio">
+          <span>👈</span>
+          <span>Ir al Kiosco</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Métricas / KPIs en Vivo -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon blue">📦</div>
+        <div class="kpi-info">
+          <span class="kpi-value" id="metric-total-prods">-</span>
+          <span class="kpi-label">Productos Registrados</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon green">📊</div>
+        <div class="kpi-info">
+          <span class="kpi-value" id="metric-total-stock">-</span>
+          <span class="kpi-label">Unidades en Stock</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon red">🚫</div>
+        <div class="kpi-info">
+          <span class="kpi-value" id="metric-agotados">-</span>
+          <span class="kpi-label">Productos Agotados</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon yellow">⚠️</div>
+        <div class="kpi-info">
+          <span class="kpi-value" id="metric-stock-bajo">-</span>
+          <span class="kpi-label">Stock Crítico (≤3)</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8;">⚪</div>
+        <div class="kpi-info">
+          <span class="kpi-value" id="metric-desactivados">0</span>
+          <span class="kpi-label">Desactivados</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple">💰</div>
+        <div class="kpi-info">
+          <span class="kpi-value" id="metric-valor-inv">$0</span>
+          <span class="kpi-label">Valor del Inventario</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barra de Herramientas y Filtros -->
+    <section class="admin-toolbar">
+      <div class="toolbar-left">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="admin-search-input" placeholder="Buscar por nombre de producto..." />
+        </div>
+
+        <select id="admin-category-filter" class="filter-select">
+          <option value="">Todas las Categorías</option>
+          <!-- Poblado por JS -->
+        </select>
+
+        <select id="admin-stock-filter" class="filter-select">
+          <option value="todos">Todos los Estados</option>
+          <option value="activos">Solo Activos</option>
+          <option value="desactivados">Solo Desactivados</option>
+          <option value="disponible">Disponibles en Stock</option>
+          <option value="bajo">Stock Crítico (≤3)</option>
+          <option value="agotado">Agotados (0)</option>
+        </select>
+
+        <select id="admin-role-filter" class="filter-select">
+          <option value="todos">Todos los Roles</option>
+          <option value="base">🥖 Solo Bases (Panes)</option>
+          <option value="ingrediente">🥑 Solo Ingredientes</option>
+          <option value="ninguno">📦 Solo Regulares</option>
+        </select>
+
+        <select id="admin-diet-filter" class="filter-select">
+          <option value="todos">Toda la Dieta</option>
+          <option value="vegetariano">🌱 Solo Vegetarianos</option>
+          <option value="vegano">🌿 Solo Veganos</option>
+          <option value="no-vegetariano">🥩 Con Carne</option>
+        </select>
+      </div>
+
+      <div class="toolbar-right">
+        <button id="btn-toggle-grid" class="view-toggle-btn" title="Vista en tarjetas">🎴 Cuadrícula</button>
+        <button id="btn-toggle-table" class="view-toggle-btn active" title="Vista en tabla">📋 Tabla</button>
+        <button id="btn-refresh-admin" class="btn-icon" title="Refrescar catálogo">🔄 Refrescar</button>
+        <button id="btn-open-create-modal" class="btn-create">
+          <span>+</span>
+          <span>Nuevo Producto</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Contenedor de Productos (Vista Tabla por Defecto y Vista Cuadrícula) -->
+    <main>
+      <div id="admin-grid-view" class="admin-products-grid" style="display: none;">
+        <!-- Renderizado por JS -->
+        <div style="grid-column: 1/-1; text-align:center; padding: 3rem; color: var(--text-muted);">
+          Cargando catálogo desde SQLite...
+        </div>
+      </div>
+
+      <div id="admin-table-view" class="admin-table-container" style="display: block;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>ID</th>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Precio (CLP)</th>
+              <th>Stock</th>
+              <th>Estado</th>
+              <th style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-tbody">
+            <!-- Renderizado por JS -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Modal Agregar / Editar Producto -->
+    <div class="admin-modal-backdrop" id="modal-producto" style="display: none;">
+      <div class="admin-modal-card">
+        <div class="modal-header-row">
+          <h2 id="modal-producto-title">Agregar Nuevo Producto</h2>
+          <button type="button" class="btn-close-modal" id="btn-close-producto-modal">✕</button>
+        </div>
+
+        <form id="form-producto">
+          <input type="hidden" id="prod-id" value="" />
+
+          <div class="form-group">
+            <label for="prod-nombre">Nombre del Producto *</label>
+            <input type="text" id="prod-nombre" class="form-control" placeholder="Ej: Sandwich Vegetariano Especial" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="prod-categoria">Categoría *</label>
+              <input type="text" id="prod-categoria" class="form-control" list="lista-categorias-datalist" placeholder="Ej: Comidas, Bebidas..." required />
+              <datalist id="lista-categorias-datalist">
+                <option value="Comidas">
+                <option value="Acompañamientos">
+                <option value="Bebidas">
+                <option value="Cafetería">
+                <option value="Postres">
+                <option value="Panes">
+                <option value="Proteínas">
+                <option value="Agregados">
+                <option value="Salsas">
+                <option value="Sandwiches Custom">
+              </datalist>
+            </div>
+
+            <div class="form-group">
+              <label for="prod-precio">Precio ($ CLP) *</label>
+              <input type="number" id="prod-precio" class="form-control" min="0" step="100" placeholder="Ej: 4500" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prod-stock">Stock Disponible (Unidades) *</label>
+            <input type="number" id="prod-stock" class="form-control" min="0" step="1" placeholder="Ej: 20" required />
+          </div>
+
+          <!-- Rol en Sandwich Personalizado -->
+          <div class="form-group" style="background: rgba(13, 18, 30, 0.4); padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--bg-card-border);">
+            <label for="prod-tipo-personalizado" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span>🥪 Rol en Sandwich Personalizado *</span>
+              <span id="role-badge-preview" class="admin-role-badge badge-role-none">Regular</span>
+            </label>
+            <select id="prod-tipo-personalizado" class="form-control" style="background: var(--bg-input); font-weight: 600;">
+              <option value="ninguno">📦 Producto Regular (No aplica a sandwich personalizado)</option>
+              <option value="base">🥖 Base / Pan (Obligatorio seleccionar al inicio)</option>
+              <option value="ingrediente">🥑 Ingrediente (Seleccionable tras elegir la base)</option>
+            </select>
+            <small style="color: var(--text-muted); font-size: 0.76rem; display: block; margin-top: 0.35rem;">
+              Las <strong>Bases</strong> se exigen obligatoriamente al inicio al armar un sandwich, y los <strong>Ingredientes</strong> se despliegan automáticamente después.
+            </small>
+          </div>
+
+          <!-- Opciones Dietarias (Vegetariano y Vegano) -->
+          <div class="form-group" style="background: rgba(13, 18, 30, 0.4); padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--bg-card-border);">
+            <label style="display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.85rem;">🌱 Clasificación Dietaria</label>
+            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                <input type="checkbox" id="prod-es-vegetariano" style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;" />
+                <span style="font-weight: 600;">🌱 Vegetariano</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0; cursor: pointer; color: var(--text-primary); font-size: 0.85rem;">
+                <input type="checkbox" id="prod-es-vegano" style="width: 18px; height: 18px; accent-color: #059669; cursor: pointer;" />
+                <span style="font-weight: 600;">🌿 Vegano</span>
+              </label>
+            </div>
+            <small style="color: var(--text-muted); font-size: 0.76rem; display: block; margin-top: 0.35rem;">
+              Permite a los clientes filtrar o consultar por voz sándwiches e ingredientes aptos para dietas vegetarianas o veganas.
+            </small>
+          </div>
+
+          <!-- Estado Activo / Desactivado -->
+          <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem; background: rgba(13, 18, 30, 0.4); padding: 0.65rem 0.9rem; border-radius: var(--radius-md); border: 1px solid var(--bg-card-border);">
+            <input type="checkbox" id="prod-activo" checked style="width: 18px; height: 18px; accent-color: #10b981; cursor: pointer;" />
+            <label for="prod-activo" style="margin: 0; cursor: pointer; color: var(--text-primary); font-weight: 600; font-size: 0.85rem;">
+              Producto Activo en la Carta (visible para los clientes)
+            </label>
+          </div>
+
+          <!-- Imagen del Producto -->
+          <div class="form-group">
+            <label>Imagen del Producto</label>
+            
+            <!-- Previsualización -->
+            <div class="image-preview-box" id="img-preview-box">
+              <img id="img-preview-tag" src="" alt="Previsualización" />
+              <button type="button" class="btn-remove-preview" id="btn-remove-img" title="Quitar imagen">✕</button>
+            </div>
+
+            <!-- Zona de subida de archivo -->
+            <div class="image-picker-zone" id="drop-zone">
+              <input type="file" id="file-input-image" accept="image/png,image/jpeg,image/webp,image/svg+xml" style="display:none;" />
+              <span style="font-size: 1.6rem;">📁</span>
+              <p style="font-size: 0.85rem; color: var(--text-primary); font-weight: 600;">
+                Haz clic o arrastra un archivo de imagen aquí
+              </p>
+              <small style="color: var(--text-muted);">Soporta JPG, PNG, WEBP o SVG (se guarda en static/uploads)</small>
+            </div>
+
+            <!-- Opción alternativa URL -->
+            <div style="margin-top: 0.6rem;">
+              <input type="url" id="prod-imagen-url" class="form-control" placeholder="O pega una URL de imagen externa (https://...)" />
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="btn-cancel-modal">Cancelar</button>
+            <button type="submit" class="btn-create" id="btn-save-product">
+              <span>💾</span>
+              <span>Guardar Producto</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Confirmar Eliminación -->
+    <div class="admin-modal-backdrop" id="modal-eliminar" style="display: none;">
+      <div class="admin-modal-card" style="max-width: 420px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">⚠️</div>
+        <h2 style="font-size: 1.25rem;">¿Eliminar este producto?</h2>
+        <p id="delete-confirm-text" style="color: var(--text-secondary); font-size: 0.88rem; margin: 0.75rem 0 1.25rem;">
+          Esta acción eliminará el producto del catálogo y de la base de datos SQLite.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 0.75rem;">
+          <button type="button" class="btn-secondary" id="btn-cancel-delete">Cancelar</button>
+          <button type="button" class="btn-create" id="btn-confirm-delete" style="background: #ef4444; color: #fff;">
+            <span>🗑️</span>
+            <span>Sí, Eliminar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor Toast de Notificaciones -->
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script src="/static/admin.js"></script>
+</body>
+</html>
